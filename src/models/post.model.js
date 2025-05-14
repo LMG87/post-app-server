@@ -1,6 +1,7 @@
-const { Sequelize, DataTypes } = require("sequelize");
+const { DataTypes } = require("sequelize");
 const sequelize = require("../db/db");
-const User = require("./user.model");
+const Like = require("./like.model");
+const Comment = require("./comment.model");
 
 const Post = sequelize.define(
   "Post",
@@ -37,5 +38,28 @@ const Post = sequelize.define(
   }
 );
 
+Post.hasMany(Like, {
+  foreignKey: "post_id",
+  sourceKey: "id",
+  as: "Likes"
+});
+
+Like.belongsTo(Post, {
+  foreignKey: "post_id",
+  targetKey: "id",
+  as: "Post"
+});
+
+Post.hasMany(Comment, {
+  foreignKey: "post_id",
+  sourceKey: "id",
+  as: "Comments"
+});
+
+Comment.belongsTo(Post, {
+  foreignKey: "post_id",
+  targetKey: "id",
+  as: "Post"
+});
 
 module.exports = Post;

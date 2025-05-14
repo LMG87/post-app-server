@@ -1,6 +1,8 @@
 const { Sequelize, Model, DataTypes } = require("sequelize");
 const sequelize = require("../db/db");
 const Post = require("./post.model");
+const Like = require("./like.model");
+const Comment = require("./comment.model");
 
 const User = sequelize.define(
   "User",
@@ -60,11 +62,35 @@ const User = sequelize.define(
 User.hasMany(Post, {
   foreignKey: "author_id",
   sourceKey: "id",
-  as: "Author"
+  as: "Posts"
 });
 
 Post.belongsTo(User, {
   foreignKey: "author_id",
+  targetKey: "id",
+  as: "Author"
+});
+
+User.hasMany(Like, {
+  foreignKey: "user_id",
+  sourceKey: "id",
+  as: "Likes"
+});
+
+Like.belongsTo(User, {
+  foreignKey: "user_id",
+  targetKey: "id",
+  as: "Author"
+});
+
+User.hasMany(Comment, {
+  foreignKey: "user_id",
+  sourceKey: "id",
+  as: "Comments"
+});
+
+Comment.belongsTo(User, {
+  foreignKey: "user_id",
   targetKey: "id",
   as: "Author"
 });

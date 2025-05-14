@@ -1,13 +1,12 @@
 const { successResponse, errorResponse } = require("../utils/response");
 const postService = require("../services/post.service");
 
-const created = async (req, res) => {
+const created = async (req, res, next) => {
     try {
         const post = await postService.created(req.body);
         return successResponse(res, post, "creado exitosamente.", 201);
     } catch (error) {
-        console.error(error);
-        return errorResponse(res, error, "Error al crear.", 500);
+        next(error)
     }
 };
 
@@ -16,42 +15,41 @@ const updated = async (req, res, next) => {
         const post = await postService.updated(req.params.id, req.body)
         return successResponse(res, post, "actualizado exitosamente.", 200);
     } catch (error) {
-        return errorResponse(res, error, "Error al actualizar.", 500);
+        next(error)
     }
 };
 
-const getAll = async (req, res) => {
+const getAll = async (req, res, next) => {
     try {
-        const posts = await postService.getAll();
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 10;
+        const posts = await postService.getAll(page, limit);
         return successResponse(res, posts, "Consulta exitosa.", 200);
 
     } catch (error) {
-        console.error(error);
-        return errorResponse(res, error, "Error al obtener registros.", 500);
+        next(error)
     }
 };
 
-const getById = async (req, res) => {
+const getById = async (req, res, next) => {
     try {
         const post = await postService.getById(req.params.id);
-        if (!post) return errorResponse(res, error, "Registro no encontrado.", 404);
+        if (!post) return errorResponse(res, post, "Registro no encontrado.", 404);
         return successResponse(res, post, "Consulta exitosa.", 200);
     } catch (error) {
-        console.error(error);
-        return errorResponse(res, error, "Error al obtener registro.", 500);
+        next(error)
     }
 };
 
-const deleted = async (req, res) => {
+const deleted = async (req, res, next) => {
     try {
         await postService.deleted(req.params.id);
         return successResponse(res, req.params.id, "eliminado correctamente.", 200);
     } catch (error) {
-        console.error(error);
-        return errorResponse(res, error, "Error al eliminar.", 500);
+        next(error)
     }
 };
-const getImage = async (req, res) => {
+const getImage = async (req, res, next) => {
     try {
         const imagePath = await postService.getImage(req.params.id);
         if (imagePath === "") {
@@ -59,10 +57,17 @@ const getImage = async (req, res) => {
         }
         return res.sendFile(imagePath);
     } catch (error) {
-        return errorResponse(res, error, "Error al obtener la imagen.", 500);
+        next(error)
     }
 };
-
+const updatedImage = async (req, res, next) => {
+    try {
+        const post = await postService.updatedImage(req.params.id, req.file ? req.file.filename : null);
+        return successResponse(res, post, "actualizado correctamente.", 200);
+    } catch (error) {
+        next(error)
+    }
+}
 
 module.exports = {
     created,
@@ -70,5 +75,6 @@ module.exports = {
     getAll,
     getById,
     deleted,
-    getImage
+    getImage,
+    updatedImage
 }

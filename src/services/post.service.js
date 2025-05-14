@@ -1,5 +1,6 @@
 const Post = require('../models/post.model');
 const User = require('../models/user.model');
+const { throwIfNotFound } = require('../utils/db');
 const path = require("path");
 const fs = require("fs");
 
@@ -12,17 +13,20 @@ const updated = async (id, data) => {
     const post = await Post.update(data, { where: { id } });
     return post;
 }
-const getAll = async () => {
-    return await Post.findAll({ include: { model: User, as: "Author", attributes: { exclude: ['role_id', 'createdAt', 'updatedAt'] } }, attributes: { exclude: ['author_id'] } });
+const getAll = async (page = 1, limit = 10) => {
+    const offset = (page - 1) * limit;
+    const posts = await Post.findAll({ limit, offset, include: { model: User, as: "Author", attributes: { exclude: ['role_id', 'createdAt', 'updatedAt'], } }, attributes: { exclude: ['author_id'] }, order: [['createdAt', 'DESC']] });
+    return throwIfNotFound(posts);
 };
 const getById = async (id) => {
-    return await Post.findOne({
+    const post = await Post.findOne({
         where: { id },
         include: {
             model: User, as: "Author", attributes: { exclude: ['role_id', 'createdAt', 'updatedAt'] }
         },
         attributes: { exclude: ['author_id'] }
     });
+    return throwIfNotFound(post)
 };
 const deleted = async (id) => {
     return await Post.destroy({ where: { id } });
@@ -41,11 +45,28 @@ const getImage = async (id) => {
     }
     return postPath;
 };
+const updatedImage = async (id, image) => {
+    const post = await Post.findByPk(id);
+
+    if (!post) {
+        return;
+    }
+    // Borrar avatar anterior si existe
+    if (post.image) {
+        const oldPath = path.join(__dirname, '../..', 'uploads', 'images', 'users', 'avatar', post.image);
+        if (fs.existsSync(oldPath)) {
+            fs.unlinkSync(oldPath); // Elimina el archivo anterior
+        }
+    }
+    post.image = image;
+    return await post.save();
+}
 module.exports = {
     created,
     updated,
     getAll,
     getById,
     deleted,
-    getImage
+    getImage,
+    updatedImage
 };

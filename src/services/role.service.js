@@ -1,4 +1,5 @@
 const Role = require('../models/role.model');
+const { throwIfNotFound } = require('../utils/db');
 
 const created = async (data) => {
     await Role.sync();
@@ -10,10 +11,12 @@ const updated = async (id, data) => {
     return role;
 }
 const getAll = async () => {
-    return await Role.findAll();
+    const roles = await Role.findAll();
+    return throwIfNotFound(roles)
 };
 const getById = async (id) => {
-    return await Role.findOne({ where: { id } });
+    const role = await Role.findOne({ where: { id } });
+    return throwIfNotFound(role)
 };
 const deleted = async (id) => {
     return await Role.destroy({ where: { id } });

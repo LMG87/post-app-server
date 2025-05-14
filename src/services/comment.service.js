@@ -1,31 +1,26 @@
-const Like = require('../models/like.model');
+const Comment = require('../models/comment.model');
 const User = require('../models/user.model');
 const { throwIfNotFound } = require('../utils/db');
 
 const created = async (data) => {
-    await Like.sync();
-    const like = await Like.create(data);
-    return like;
+    await Comment.sync();
+    const comment = await Comment.create(data);
+    return comment;
 };
 const updated = async (id, data) => {
-    const like = await Like.update(data, { where: { id } });
-    return like;
+    const comment = await Comment.update(data, { where: { id } });
+    return comment;
 }
 const getAll = async () => {
-    const like = await Like.findAll();
-    if (!like) {
-        const error = new Error("Registros no encontrados.");
-        error.status = 404;
-        throw error;
-    }
-    return throwIfNotFound(like);
+    const comments = await Comment.findAll();
+    return throwIfNotFound(comments);
 };
 const getById = async (id) => {
-    const like = await Like.findOne({ where: { id } });
-    return throwIfNotFound(like);
+    const comment = await Comment.findOne({ where: { id } });
+    return throwIfNotFound(comment);
 };
 const getByPost = async (post) => {
-    const like = await Like.findOne({
+    const comment = await Comment.findOne({
         where: { post_id: post },
         include: {
             model: User, as: "Author",
@@ -34,12 +29,11 @@ const getByPost = async (post) => {
             }
         }
     });
-    return throwIfNotFound(like);
+    return throwIfNotFound(comment);
 };
 const deleted = async (id) => {
-    return await Like.destroy({ where: { id } });
+    return await Comment.destroy({ where: { id } });
 };
-
 module.exports = {
     created,
     updated,

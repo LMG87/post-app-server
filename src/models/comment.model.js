@@ -1,13 +1,17 @@
-const { DataTypes } = require('sequelize');
-const sequelize = require("../db/db");
+const { DataTypes, Model } = require('sequelize');
+const sequelize = require('../db/db');
 
-const Like = sequelize.define(
-    "Like",
+const Comment = sequelize.define(
+    'Comment',
     {
         id: {
             type: DataTypes.UUID,
             defaultValue: DataTypes.UUIDV4,
             primaryKey: true
+        },
+        content: {
+            type: DataTypes.STRING,
+            allowNull: false
         },
         post_id: {
             type: DataTypes.UUID,
@@ -21,4 +25,5 @@ const Like = sequelize.define(
     }
 );
 
-module.exports = Like;
+
+module.exports = Comment;

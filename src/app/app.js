@@ -7,7 +7,9 @@ const path = require("path");
 const roles = require("../routes/role.routes");
 const users = require("../routes/user.routes");
 const posts = require("../routes/post.routes");
-// const auth = require("../routes/auth.routes");
+const likes = require("../routes/like.routes");
+const comments = require("../routes/coment.routes");
+const auth = require("../routes/auth.routes");
 const errorHandler = require("../middlewares/errorHandler");
 
 const app = express();
@@ -25,7 +27,9 @@ app.set("port", config.app.port);
 app.use("/api/roles", roles);
 app.use("/api/users", users);
 app.use("/api/posts", posts);
-// app.use("/api/auth", auth);
+app.use("/api/likes", likes);
+app.use("/api/comments", comments);
+app.use("/api/auth", auth);
 app.use(errorHandler);
 
 // public static files
