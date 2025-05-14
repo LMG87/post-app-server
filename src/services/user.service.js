@@ -35,7 +35,7 @@ const updated = async (id, data) => {
 }
 const getAll = async (page = 1, limit = 10) => {
     const offset = (page - 1) * limit;
-    const { count, rows } = await User.findAndCountAll({ limit, offset, include: { model: Role, as: "Role", attributes: { exclude: ['createdAt', 'updatedAt'] } }, attributes: { exclude: ['role_id'] } });
+    const { count, rows } = await User.findAndCountAll({ limit, offset, include: { model: Role, as: "Role", attributes: { exclude: ['createdAt', 'updatedAt'] } }, attributes: { exclude: ['role_id'] }, order: [['createdAt', 'DESC']] });
     const totalPages = Math.ceil(count / limit);
     if (page > totalPages) {
         throw error(`Page ${page} exceeds total pages (${totalPages})`, 404);
@@ -58,7 +58,9 @@ const getById = async (id) => {
     return throwIfNotFound(user)
 };
 const deleted = async (id) => {
-    return await User.destroy({ where: { id } });
+    const user = await User.destroy({ where: { id } });
+    await Auth.destroy({ where: { id } });
+    return user;
 };
 const getAvatar = async (id) => {
     const user = await User.findOne({ where: { id } });

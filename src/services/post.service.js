@@ -15,7 +15,7 @@ const updated = async (id, data) => {
 }
 const getAll = async (page = 1, limit = 10) => {
     const offset = (page - 1) * limit;
-    const posts = await Post.findAll({ limit, offset, include: { model: User, as: "Author", attributes: { exclude: ['role_id', 'createdAt', 'updatedAt'], } }, attributes: { exclude: ['author_id'] } });
+    const posts = await Post.findAll({ limit, offset, include: { model: User, as: "Author", attributes: { exclude: ['role_id', 'createdAt', 'updatedAt'], } }, attributes: { exclude: ['author_id'] }, order: [['createdAt', 'DESC']] });
     return throwIfNotFound(posts);
 };
 const getById = async (id) => {
