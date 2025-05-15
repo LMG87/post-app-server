@@ -11,16 +11,30 @@ const updated = async (id, data) => {
     const comment = await Comment.update(data, { where: { id } });
     return comment;
 }
-const getAll = async () => {
-    const comments = await Comment.findAll();
+const getAll = async (page = 1, limit = 10) => {
+    const offset = (page - 1) * limit;
+    const { count, rows } = await Comment.findAndCountAll({ limit, offset });
+    const totalPages = Math.ceil(count / limit);
+    if (page > totalPages) {
+        throw error(`Page ${page} exceeds total pages (${totalPages})`, 404);
+    }
+    const comments = {
+        totalItems: count,
+        totalPages: totalPages,
+        currentPage: page,
+        comments: rows,
+    };
     return throwIfNotFound(comments);
 };
 const getById = async (id) => {
     const comment = await Comment.findOne({ where: { id } });
     return throwIfNotFound(comment);
 };
-const getByPost = async (post) => {
-    const comment = await Comment.findOne({
+const getByPost = async (post, page = 1, limit = 10) => {
+    const offset = (page - 1) * limit;
+    const { count, rows } = await Comment.findAndCountAll({
+        limit,
+        offset,
         where: { post_id: post },
         include: {
             model: User, as: "Author",
@@ -29,7 +43,17 @@ const getByPost = async (post) => {
             }
         }
     });
-    return throwIfNotFound(comment);
+    const totalPages = Math.ceil(count / limit);
+    if (page > totalPages) {
+        throw error(`Page ${page} exceeds total pages (${totalPages})`, 404);
+    }
+    const comments = {
+        totalItems: count,
+        totalPages: totalPages,
+        currentPage: page,
+        comments: rows,
+    };
+    return throwIfNotFound(comments);
 };
 const deleted = async (id) => {
     return await Comment.destroy({ where: { id } });
