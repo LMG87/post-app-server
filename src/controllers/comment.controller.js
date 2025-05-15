@@ -21,7 +21,9 @@ const updated = async (req, res, next) => {
 
 const getAll = async (req, res, next) => {
     try {
-        const comments = await commentService.getAll();
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 10;
+        const comments = await commentService.getAll(page, limit);
         return successResponse(res, comments, "Consulta exitosa.", 200);
     } catch (error) {
         next(error)
@@ -39,7 +41,9 @@ const getById = async (req, res, next) => {
 
 const getByPost = async (req, res, next) => {
     try {
-        const comment = await commentService.getByPost(req.params.post);
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 10;
+        const comment = await commentService.getByPost(req.params.post, page, limit);
         return successResponse(res, comment, "Consulta exitosa.", 200);
     } catch (error) {
         next(error)
