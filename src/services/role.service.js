@@ -10,8 +10,19 @@ const updated = async (id, data) => {
     const role = await Role.update(data, { where: { id } });
     return role;
 }
-const getAll = async () => {
-    const roles = await Role.findAll();
+const getAll = async (page = 1, limit = 10) => {
+    const offset = (page - 1) * limit;
+    const { count, rows } = await Role.findAndCountAll({ limit, offset });
+    const totalPages = Math.ceil(count / limit);
+    if (page > totalPages) {
+        throw error(`Page ${page} exceeds total pages (${totalPages})`, 404);
+    }
+    const roles = {
+        totalItems: count,
+        totalPages: totalPages,
+        currentPage: page,
+        roles: rows,
+    };
     return throwIfNotFound(roles)
 };
 const getById = async (id) => {

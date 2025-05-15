@@ -25,7 +25,7 @@ const getById = async (id) => {
     return throwIfNotFound(like);
 };
 const getByPost = async (post) => {
-    const like = await Like.findOne({
+    const { count, rows } = await Like.findAndCountAll({
         where: { post_id: post },
         include: {
             model: User, as: "Author",
@@ -34,7 +34,17 @@ const getByPost = async (post) => {
             }
         }
     });
-    return throwIfNotFound(like);
+    const totalPages = Math.ceil(count / limit);
+    if (page > totalPages) {
+        throw error(`Page ${page} exceeds total pages (${totalPages})`, 404);
+    }
+    const likes = {
+        totalItems: count,
+        totalPages: totalPages,
+        currentPage: page,
+        likes: rows,
+    };
+    return throwIfNotFound(likes);
 };
 const deleted = async (id) => {
     return await Like.destroy({ where: { id } });
