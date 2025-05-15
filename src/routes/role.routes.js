@@ -7,7 +7,7 @@ const controller = require("../controllers/role.controller");
 router.get("/", apiKeyMiddleware, controller.getAll);
 router.get("/:id", apiKeyMiddleware, controller.getById);
 router.post("/", apiKeyMiddleware, controller.created);
-router.put("/", protectedRoute('admin'), controller.updated);
+router.put("/:id", protectedRoute('admin'), controller.updated);
 router.delete("/:id", protectedRoute('admin'), controller.deleted);
 
 module.exports = router;
