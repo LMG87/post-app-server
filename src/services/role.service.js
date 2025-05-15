@@ -12,7 +12,7 @@ const updated = async (id, data) => {
 }
 const getAll = async (page = 1, limit = 10) => {
     const offset = (page - 1) * limit;
-    const { count, rows } = await Role.findAndCountAll({ limit, offset });
+    const { count, rows } = await Role.findAndCountAll({ limit, offset, order: [['createdAt', 'DESC']] });
     const totalPages = Math.ceil(count / limit);
     if (page > totalPages) {
         throw error(`Page ${page} exceeds total pages (${totalPages})`, 404);

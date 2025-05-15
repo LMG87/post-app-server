@@ -33,6 +33,7 @@ const getByPost = async (post) => {
                 exclude: ['role_id', 'createdAt', 'updatedAt']
             }
         }
+        , order: [['createdAt', 'DESC']]
     });
     const totalPages = Math.ceil(count / limit);
     if (page > totalPages) {
