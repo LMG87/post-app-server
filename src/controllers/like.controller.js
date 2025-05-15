@@ -39,9 +39,7 @@ const getById = async (req, res, next) => {
 
 const getByPost = async (req, res, next) => {
     try {
-        const page = parseInt(req.query.page) || 1;
-        const limit = parseInt(req.query.limit) || 10;
-        const like = await likeService.getByPost(req.params.post, page, limit);
+        const like = await likeService.getByPost(req.params.post);
         return successResponse(res, like, "Consulta exitosa.", 200);
     } catch (error) {
         next(error)
