@@ -22,7 +22,9 @@ const updated = async (req, res, next) => {
 
 const getAll = async (req, res, next) => {
     try {
-        const users = await roleService.getAll();
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 10;
+        const users = await roleService.getAll(page, limit);
         return successResponse(res, users, "Consulta exitosa.", 200);
 
     } catch (error) {
