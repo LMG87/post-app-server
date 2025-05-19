@@ -12,6 +12,6 @@ router.post("/", protectedRoute(), controller.created);
 router.put("/:id", protectedRoute(), controller.updated);
 router.delete("/:id", protectedRoute(), controller.deleted);
 router.get('/image/:id', controller.getImage);
-router.post('/image/:id', [protectedRoute(), upload.single('post')], controller.updatedImage);
+router.put('/image/:id', [protectedRoute(), upload.single('post')], controller.updatedImage);
 
 module.exports = router;
