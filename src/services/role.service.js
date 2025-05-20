@@ -10,20 +10,33 @@ const updated = async (id, data) => {
     const role = await Role.update(data, { where: { id } });
     return role;
 }
-const getAll = async (page = 1, limit = 10) => {
-    const offset = (page - 1) * limit;
-    const { count, rows } = await Role.findAndCountAll({ limit, offset, order: [['createdAt', 'DESC']] });
+const getAll = async (page, limit) => {
+    let options = {
+        order: [['createdAt', 'DESC']]
+    };
+    if (page && limit) {
+        const offset = (page - 1) * limit;
+        options.limit = limit;
+        options.offset = offset;
+    }
+    const { count, rows } = await Role.findAndCountAll(options);
+
+    if (!page || !limit) {
+        return throwIfNotFound({
+            totalItems: count,
+            roles: rows
+        });
+    }
     const totalPages = Math.ceil(count / limit);
     if (page > totalPages) {
         throw error(`Page ${page} exceeds total pages (${totalPages})`, 404);
     }
-    const roles = {
+    return throwIfNotFound({
         totalItems: count,
-        totalPages: totalPages,
+        totalPages,
         currentPage: page,
-        roles: rows,
-    };
-    return throwIfNotFound(roles)
+        roles: rows
+    });
 };
 const getById = async (id) => {
     const role = await Role.findOne({ where: { id } });
