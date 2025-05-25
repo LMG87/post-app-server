@@ -23,9 +23,9 @@ function verifyToken(token) {
 
 const checkToken = {
     confirmToken: function (req, id, requiredRole) {
-        const { datavalues, role } = decodeHeader(req);
-        const { id: userId } = datavalues;
-
+        const { dataValues, role } = decodeHeader(req);
+        const { id: userId } = dataValues;
+        console.log({ userId, id });
         const isAdmin = (role === "admin");
         const isOwner = (userId === id);
 

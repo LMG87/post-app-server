@@ -1,9 +1,7 @@
 const express = require("express");
-const helmet = require('helmet');
 const morgan = require("morgan");
 const config = require("../config");
 const cors = require("cors");
-const rateLimit = require('express-rate-limit');
 const path = require("path");
 
 const roles = require("../routes/role.routes");
@@ -19,22 +17,10 @@ const app = express();
 //middlewares
 app.use(morgan("dev"));
 
-app.use(helmet({
-  contentSecurityPolicy: {
-    directives: {
-      defaultSrc: ["'self'"],
-      scriptSrc: ["'self'", 'https://cdn.jsdelivr.net'],
-      styleSrc: ["'self'", 'https://fonts.googleapis.com'],
-      fontSrc: ["'self'", 'https://fonts.gstatic.com'],
-      imgSrc: ["'self'", 'data:'],
-    },
-  },
-  crossOriginEmbedderPolicy: false,
-}));
 app.use(cors({
   allowedOrigins: [config.app.CORS_ORIGIN],
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
-  credentials: true,
+  credentials: false,
 }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
