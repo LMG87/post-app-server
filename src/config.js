@@ -18,4 +18,5 @@ module.exports = {
     dialect: process.env.MYSQL_DIALECT || "mysql",
   },
   apiKey: process.env.API_KEY,
+  CORS_ORIGIN: process.env.CORS_ORIGIN || '*',
 };
