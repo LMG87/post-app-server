@@ -120,3 +120,5 @@ npm run start      # Inicia API en modo producción
 Headers seguros con helmet
 Protección de rutas con JWT
 ```
+
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/LMG87/post-app-server)
