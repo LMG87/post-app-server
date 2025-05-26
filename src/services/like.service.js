@@ -2,28 +2,22 @@ const Like = require('../models/like.model');
 const User = require('../models/user.model');
 const { throwIfNotFound } = require('../utils/db');
 
+
+const toggle = async (id, data) => {
+    await Like.sync();
+    const like = await Like.findByPk(id);
+    if (!like) {
+        this.created(data);
+    }
+    this.deleted(id);
+}
+
 const created = async (data) => {
     await Like.sync();
     const like = await Like.create(data);
     return like;
 };
-const updated = async (id, data) => {
-    const like = await Like.update(data, { where: { id } });
-    return like;
-}
-const getAll = async () => {
-    const like = await Like.findAll();
-    if (!like) {
-        const error = new Error("Registros no encontrados.");
-        error.status = 404;
-        throw error;
-    }
-    return throwIfNotFound(like);
-};
-const getById = async (id) => {
-    const like = await Like.findOne({ where: { id } });
-    return throwIfNotFound(like);
-};
+
 const getByPost = async (post) => {
     const { count, rows } = await Like.findAndCountAll({
         where: { post_id: post },
@@ -52,10 +46,7 @@ const deleted = async (id) => {
 };
 
 module.exports = {
-    created,
-    updated,
-    getAll,
-    getById,
+    toggle,
     getByPost,
-    deleted
+
 };

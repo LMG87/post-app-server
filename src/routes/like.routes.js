@@ -5,11 +5,7 @@ const apiKeyMiddleware = require('../middlewares/apiKey.middlewar');
 const controller = require("../controllers/like.controller");
 
 
-router.get("/", apiKeyMiddleware, controller.getAll);
-router.get("/:id", apiKeyMiddleware, controller.getById);
 router.get("/post/:post", apiKeyMiddleware, controller.getByPost);
-router.post("/", protectedRoute(), controller.created);
-router.put("/:id", protectedRoute(), controller.updated);
-router.delete("/:id", protectedRoute(), controller.deleted);
+router.post("/", protectedRoute(), controller.toggle);
 
 module.exports = router;

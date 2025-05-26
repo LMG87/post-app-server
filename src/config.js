@@ -17,6 +17,10 @@ module.exports = {
     port: process.env.MYSQL_PORT || 3306,
     dialect: process.env.MYSQL_DIALECT || "mysql",
   },
+  redis: {
+    host: process.env.REDIS_HOST || "localhost",
+    port: process.env.REDIS_PORT || 6379,
+  },
   apiKey: process.env.API_KEY,
   CORS_ORIGIN: process.env.CORS_ORIGIN || '*',
 };
