@@ -22,8 +22,8 @@ const updated = async (req, res, next) => {
 
 const getAll = async (req, res, next) => {
   try {
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 10;
+    const page = parseInt(req.query.page) || undefined;
+    const limit = parseInt(req.query.limit) || undefined;
 
     const users = await userService.getAll(page, limit);
     return successResponse(res, users, "Consulta exitosa.", 200);

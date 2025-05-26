@@ -33,21 +33,38 @@ const updated = async (id, data) => {
     }, { where: { id } });
     return user;
 }
-const getAll = async (page = 1, limit = 10) => {
-    const offset = (page - 1) * limit;
-    const { count, rows } = await User.findAndCountAll({ limit, offset, include: { model: Role, as: "Role", attributes: { exclude: ['createdAt', 'updatedAt'] } }, attributes: { exclude: ['role_id'] }, order: [['createdAt', 'DESC']] });
+const getAll = async (page, limit) => {
+    let options = {
+        include: {
+            model: Role,
+            as: "Role",
+            attributes: { exclude: ['createdAt', 'updatedAt'] }
+        },
+        attributes: { exclude: ['role_id'] },
+        order: [['createdAt', 'DESC']]
+    };
+    if (page && limit) {
+        const offset = (page - 1) * limit;
+        options.limit = limit;
+        options.offset = offset;
+    }
+    const { count, rows } = await User.findAndCountAll(options);
+    if (!page || !limit) {
+        return throwIfNotFound({
+            totalItems: count,
+            users: rows
+        });
+    }
     const totalPages = Math.ceil(count / limit);
     if (page > totalPages) {
         throw error(`Page ${page} exceeds total pages (${totalPages})`, 404);
     }
-    const users = {
+    return throwIfNotFound({
         totalItems: count,
-        totalPages: totalPages,
+        totalPages,
         currentPage: page,
-        users: rows,
-    };
-
-    return throwIfNotFound(users)
+        users: rows
+    });
 };
 const getById = async (id) => {
     const user = await User.findOne({

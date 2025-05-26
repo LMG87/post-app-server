@@ -1,4 +1,5 @@
 const express = require("express");
+const helmet = require('helmet');
 const morgan = require("morgan");
 const config = require("../config");
 const cors = require("cors");
@@ -16,7 +17,24 @@ const app = express();
 
 //middlewares
 app.use(morgan("dev"));
-app.use(cors());
+
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      imgSrc: ["'self'", 'http://localhost:4200', 'data:'],
+      scriptSrc: ["'self'"],
+      styleSrc: ["'self'", "'unsafe-inline'"],
+    },
+  },
+  crossOriginEmbedderPolicy: false,
+  crossOriginResourcePolicy: false,
+}));
+app.use(cors({
+  allowedOrigins: [config.app.CORS_ORIGIN],
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
+  credentials: false,
+}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
