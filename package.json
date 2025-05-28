@@ -25,7 +25,9 @@
     "multer": "^1.4.5-lts.2",
     "mysql2": "^3.14.1",
     "post-app": "file:",
-    "sequelize": "^6.37.7"
+    "sequelize": "^6.37.7",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.1"
   },
   "devDependencies": {
     "nodemon": "^3.1.10"

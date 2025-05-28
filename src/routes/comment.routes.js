@@ -1,45 +1,42 @@
 const router = require("express").Router();
-const upload = require('../middlewares/upload');
 const protectedRoute = require("../middlewares/protected.middleware");
 const apiKeyMiddleware = require('../middlewares/apiKey.middlewar');
-const controller = require("../controllers/post.controller");
+const controller = require("../controllers/comment.controller");
 
 /**
  * @swagger
  * components:
  *   schemas:
- *     Post:
+ *     Comment:
  *       type: object
  *       required:
- *         - title
  *         - content
- *         - author_id
+ *         - post_id
+ *         - user_id
  *       properties:
  *         id:
  *           type: string
  *           format: uuid
- *           description: ID único del post
- *         title:
- *           type: string
- *           description: Título del post
+ *           description: ID único del comentario
  *         content:
  *           type: string
- *           description: Contenido del post
- *         image:
- *           type: string
- *           description: Nombre del archivo de imagen
- *         author_id:
+ *           description: Contenido del comentario
+ *         post_id:
  *           type: string
  *           format: uuid
- *           description: ID del autor del post
+ *           description: ID del post al que pertenece el comentario
+ *         user_id:
+ *           type: string
+ *           format: uuid
+ *           description: ID del usuario que hizo el comentario
  */
 
 /**
  * @swagger
- * /api/posts:
+ * /api/comments:
  *   get:
- *     summary: Obtiene la lista de posts
- *     tags: [Posts]
+ *     summary: Obtiene la lista de comentarios
+ *     tags: [Comments]
  *     security:
  *       - ApiKeyAuth: []
  *     parameters:
@@ -55,7 +52,7 @@ const controller = require("../controllers/post.controller");
  *         description: Límite de registros por página
  *     responses:
  *       200:
- *         description: Lista de posts
+ *         description: Lista de comentarios
  *         content:
  *           application/json:
  *             schema:
@@ -72,13 +69,13 @@ const controller = require("../controllers/post.controller");
  *                       type: integer
  *                     currentPage:
  *                       type: integer
- *                     posts:
+ *                     comments:
  *                       type: array
  *                       items:
- *                         $ref: '#/components/schemas/Post'
+ *                         $ref: '#/components/schemas/Comment'
  *   post:
- *     summary: Crea un nuevo post
- *     tags: [Posts]
+ *     summary: Crea un nuevo comentario
+ *     tags: [Comments]
  *     security:
  *       - ApiKeyAuth: []
  *       - BearerAuth: []
@@ -87,18 +84,18 @@ const controller = require("../controllers/post.controller");
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/Post'
+ *             $ref: '#/components/schemas/Comment'
  *     responses:
  *       200:
- *         description: Post creado exitosamente
+ *         description: Comentario creado exitosamente
  */
 
 /**
  * @swagger
- * /api/posts/{id}:
+ * /api/comments/{id}:
  *   get:
- *     summary: Obtiene un post por ID
- *     tags: [Posts]
+ *     summary: Obtiene un comentario por ID
+ *     tags: [Comments]
  *     security:
  *       - ApiKeyAuth: []
  *     parameters:
@@ -107,10 +104,10 @@ const controller = require("../controllers/post.controller");
  *         schema:
  *           type: string
  *         required: true
- *         description: ID del post
+ *         description: ID del comentario
  *     responses:
  *       200:
- *         description: Post encontrado
+ *         description: Comentario encontrado
  *         content:
  *           application/json:
  *             schema:
@@ -119,32 +116,10 @@ const controller = require("../controllers/post.controller");
  *                 success:
  *                   type: boolean
  *                 data:
- *                   $ref: '#/components/schemas/Post'
- *   put:
- *     summary: Actualiza un post
- *     tags: [Posts]
- *     security:
- *       - ApiKeyAuth: []
- *       - BearerAuth: []
- *     parameters:
- *       - in: path
- *         name: id
- *         schema:
- *           type: string
- *         required: true
- *         description: ID del post
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             $ref: '#/components/schemas/Post'
- *     responses:
- *       200:
- *         description: Post actualizado exitosamente
+ *                   $ref: '#/components/schemas/Comment'
  *   delete:
- *     summary: Elimina un post
- *     tags: [Posts]
+ *     summary: Elimina un comentario
+ *     tags: [Comments]
  *     security:
  *       - ApiKeyAuth: []
  *       - BearerAuth: []
@@ -154,66 +129,66 @@ const controller = require("../controllers/post.controller");
  *         schema:
  *           type: string
  *         required: true
- *         description: ID del post
+ *         description: ID del comentario
  *     responses:
  *       200:
- *         description: Post eliminado exitosamente
+ *         description: Comentario eliminado exitosamente
  */
 
 /**
  * @swagger
- * /api/posts/image/{id}:
+ * /api/comments/post/{post}:
  *   get:
- *     summary: Obtiene la imagen de un post
- *     tags: [Posts]
- *     parameters:
- *       - in: path
- *         name: id
- *         schema:
- *           type: string
- *         required: true
- *         description: ID del post
- *     responses:
- *       200:
- *         description: Imagen del post
- *         content:
- *           image/*:
- *             schema:
- *               type: string
- *               format: binary
- *   put:
- *     summary: Actualiza la imagen de un post
- *     tags: [Posts]
+ *     summary: Obtiene los comentarios de un post
+ *     tags: [Comments]
  *     security:
  *       - ApiKeyAuth: []
- *       - BearerAuth: []
  *     parameters:
  *       - in: path
- *         name: id
+ *         name: post
  *         schema:
  *           type: string
  *         required: true
  *         description: ID del post
- *     requestBody:
- *       content:
- *         multipart/form-data:
- *           schema:
- *             type: object
- *             properties:
- *               post:
- *                 type: string
- *                 format: binary
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *         description: Número de página
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *         description: Límite de registros por página
  *     responses:
  *       200:
- *         description: Imagen actualizada exitosamente
+ *         description: Lista de comentarios del post
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     totalItems:
+ *                       type: integer
+ *                     totalPages:
+ *                       type: integer
+ *                     currentPage:
+ *                       type: integer
+ *                     comments:
+ *                       type: array
+ *                       items:
+ *                         $ref: '#/components/schemas/Comment'
  */
 
 router.get("/", apiKeyMiddleware, controller.getAll);
 router.get("/:id", apiKeyMiddleware, controller.getById);
+router.get("/post/:post", apiKeyMiddleware, controller.getByPost);
 router.post("/", protectedRoute(), controller.created);
-router.put("/:id", protectedRoute(), controller.updated);
 router.delete("/:id", protectedRoute(), controller.deleted);
-router.get('/image/:id', controller.getImage);
-router.put('/image/:id', [protectedRoute(), upload.single('post')], controller.updatedImage);
 
-module.exports = router;
+module.exports = router; 

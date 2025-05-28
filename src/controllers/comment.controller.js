@@ -1,10 +1,17 @@
 const { successResponse, errorResponse } = require("../utils/response");
 const commentService = require("../services/comment.service");
+const mainQueue = require("../queues/main.queue");
 
 const created = async (req, res, next) => {
     try {
-        const comment = await commentService.created(req.body);
-        return successResponse(res, comment, "creado exitosamente.", 201);
+        const job = await mainQueue.add({
+            entity: "comment",
+            type: "create",
+            data: req.body,
+        });
+
+        const comment = await job.finished();
+        return successResponse(res, comment, "Creación de comentario en cola.", 200);
     } catch (error) {
         next(error)
     }
@@ -52,8 +59,14 @@ const getByPost = async (req, res, next) => {
 
 const deleted = async (req, res, next) => {
     try {
-        await commentService.deleted(req.params.id);
-        return successResponse(res, req.params.id, "eliminado correctamente.", 200);
+        const { id } = req.params;
+        const job = await mainQueue.add({
+            entity: "comment",
+            type: "delete",
+            data: { id },
+        });
+
+        return successResponse(res, id, "Eliminación de comentario en cola", 200);
     } catch (error) {
         next(error)
     }
