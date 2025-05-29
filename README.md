@@ -61,15 +61,15 @@ Crea un archivo .env y completa con tu configuración:
 
 # Application configuration
 PORT = 3000
-API_KEY=71f3a2b2-643f-4b57-9c29-9019f8f69d6b
+API_KEY=your-api-key
 CORS_ORIGIN=http://localhost:4200
 
 # Database configuration
 MYSQL_HOST = localhost
 MYSQL_PORT =  3306
 MYSQL_USER = root
-MYSQL_PASSWORD =
-MYSQL_DB = post-app
+MYSQL_PASSWORD = password
+MYSQL_DB = data-base-name
 MYSQL_DIALECT = mysql
 
 # JWT configuration
@@ -81,8 +81,8 @@ REDIS_HOST=127.0.0.1
 REDIS_PORT=6379
 
 # Email configuration
-EMAIL_USER="mephisto0130@gmail.com"
-EMAIL_PASS="ejor xuck tprp homw"
+EMAIL_USER="your email"
+EMAIL_PASS="password email"
 ```
 
 # 4. Inicia Redis con Docker (si no lo tienes instalado)
