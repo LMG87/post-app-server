@@ -1,5 +1,6 @@
 const { successResponse, errorResponse } = require("../utils/response");
 const userService = require("../services/user.service");
+const { sendWelcomeEmail } = require("../utils/mailer");
 const mainQueue = require("../queues/main.queue");
 
 const created = async (req, res, next) => {
@@ -11,7 +12,14 @@ const created = async (req, res, next) => {
     });
 
     const user = await job.finished();
-    return successResponse(res, user, "Creación de usuario en cola.", 200);
+
+    const { email, password } = req.body;
+    try {
+      await sendWelcomeEmail(email, password);
+      return successResponse(res, user, "Creación de usuario en cola y correo enviado.", 200);
+    } catch (err) {
+      return successResponse(res, user, "Creación de usuario en cola, pero error al enviar correo.", 200);
+    }
   } catch (error) {
     console.error(error);
     next(error)

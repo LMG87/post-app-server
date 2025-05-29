@@ -20,7 +20,6 @@ const created = async (data) => {
             password: password,
         });
         user.dataValues["auth"] = true;
-        console.log({ user });
     } else {
         user.dataValues["auth"] = false;
     }
