@@ -3,6 +3,9 @@
 npm-debug.log
 yarn-error.log
 .env
+.env.example
+.env.local
+.env.staging
 
 # JPEG
 *.jpg
