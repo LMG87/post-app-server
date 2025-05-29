@@ -13,36 +13,55 @@ const updated = async (id, data) => {
     const post = await Post.update(data, { where: { id } });
     return post;
 }
-const getAll = async (page = 1, limit = 10) => {
-    const offset = (page - 1) * limit;
-    const { count, rows } = await Post.findAndCountAll({
-        limit,
-        offset,
+
+const getAll = async (page, limit, id) => {
+    const options = {
+        order: [['createdAt', 'DESC']],
         include: {
             model: User,
-            as: "Author",
+            as: 'Author',
             attributes: {
                 exclude: ['role_id', 'createdAt', 'updatedAt'],
             }
         },
         attributes: {
             exclude: ['author_id']
-        },
-        order: [['createdAt', 'DESC']]
-    });
-    const totalPages = Math.ceil(count / limit);
-    if (page > totalPages) {
-        throw error(`Page ${page} exceeds total pages (${totalPages})`, 404);
-    }
-    const posts = {
-        totalItems: count,
-        totalPages: totalPages,
-        currentPage: page,
-        posts: rows,
+        }
     };
 
-    return throwIfNotFound(posts);
+    if (page && limit) {
+        const offset = (page - 1) * limit;
+        options.limit = limit;
+        options.offset = offset;
+    }
+
+    if (id) {
+        options.where = { author_id: id };
+    }
+
+    const { count, rows } = await Post.findAndCountAll(options);
+
+    if (!limit || !page) {
+        return throwIfNotFound({
+            totalItems: count,
+            posts: rows,
+        });
+    }
+
+    const totalPages = Math.ceil(count / limit);
+
+    if (page > totalPages) {
+        throw new Error(`Page ${page} exceeds total pages (${totalPages})`);
+    }
+
+    return throwIfNotFound({
+        totalItems: count,
+        totalPages,
+        currentPage: page,
+        posts: rows,
+    });
 };
+
 const getById = async (id) => {
     const post = await Post.findOne({
         where: { id },

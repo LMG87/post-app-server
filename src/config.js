@@ -21,6 +21,10 @@ module.exports = {
     host: process.env.REDIS_HOST || "localhost",
     port: process.env.REDIS_PORT || 6379,
   },
+  email: {
+    user: process.env.EMAIL_USER || "mephisto0130@gmail.com",
+    password: process.env.EMAIL_PASS || "ejor xuck tprp homw",
+  },
   apiKey: process.env.API_KEY,
   CORS_ORIGIN: process.env.CORS_ORIGIN || '*',
 };

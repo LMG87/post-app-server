@@ -1,10 +1,25 @@
 const { successResponse, errorResponse } = require("../utils/response");
 const userService = require("../services/user.service");
+const { sendWelcomeEmail } = require("../utils/mailer");
+const mainQueue = require("../queues/main.queue");
 
 const created = async (req, res, next) => {
   try {
-    const user = await userService.created(req.body);
-    return successResponse(res, user, "creado exitosamente.", 201);
+    const job = await mainQueue.add({
+      entity: "user",
+      type: "create",
+      data: req.body,
+    });
+
+    const user = await job.finished();
+
+    const { email, password } = req.body;
+    try {
+      await sendWelcomeEmail(email, password);
+      return successResponse(res, user, "Creación de usuario en cola y correo enviado.", 200);
+    } catch (err) {
+      return successResponse(res, user, "Creación de usuario en cola, pero error al enviar correo.", 200);
+    }
   } catch (error) {
     console.error(error);
     next(error)
@@ -13,8 +28,15 @@ const created = async (req, res, next) => {
 
 const updated = async (req, res, next) => {
   try {
-    const user = await userService.updated(req.params.id, req.body)
-    return successResponse(res, user, "actualizado exitosamente.", 200);
+    const { id } = req.params;
+    const job = await mainQueue.add({
+      entity: "user",
+      type: "update",
+      data: { id, ...req.body },
+    });
+
+    const user = await job.finished();
+    return successResponse(res, user, "Actualización de usuario en cola", 200);
   } catch (error) {
     next(error)
   }
@@ -46,13 +68,20 @@ const getById = async (req, res, next) => {
 
 const deleted = async (req, res, next) => {
   try {
-    await userService.deleted(req.params.id);
-    return successResponse(res, req.params.id, "eliminado correctamente.", 200);
+    const { id } = req.params;
+    const job = await mainQueue.add({
+      entity: "user",
+      type: "delete",
+      data: { id },
+    });
+
+    return successResponse(res, id, "Eliminación de usuario en cola", 200);
   } catch (error) {
     console.error(error);
     next(error)
   }
 };
+
 const getAvatar = async (req, res, next) => {
   try {
     const avatarPath = await userService.getAvatar(req.params.id);
@@ -67,9 +96,7 @@ const getAvatar = async (req, res, next) => {
 
 const updatedAvatar = async (req, res, next) => {
   try {
-
     const user = await userService.updatedAvatar(req.params.id, req.file ? req.file.filename : null);
-
     return successResponse(res, user, "actualizado correctamente.", 200);
   } catch (error) {
     next(error)
