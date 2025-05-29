@@ -25,10 +25,8 @@ async function sendWelcomeEmail(to, password) {
 
     try {
         const info = await transporter.sendMail(mailOptions);
-        console.log('Correo enviado:', info.response);
         return info;
     } catch (error) {
-        console.error('Error al enviar correo:', error);
         throw error;
     }
 }
